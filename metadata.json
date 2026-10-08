@@ -1,0 +1,6 @@
+{
+  "name": "Maélane Busson - AI Voice Assistant",
+  "description": "Voice assistant representing Maélane Busson, speaking English and French with real-time Gemini Live audio.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
