@@ -5,16 +5,11 @@ import {
   PhoneCall,
   PhoneOff,
   Volume2,
-  VolumeX,
   Sparkles,
   Send,
-  RotateCcw,
   Languages,
   Radio,
-  Sliders,
-  CheckCircle,
   HelpCircle,
-  AlertCircle,
 } from 'lucide-react';
 import { AudioWaveformVisualizer } from './AudioWaveformVisualizer.tsx';
 import { LiveAudioPlayer } from '../utils/audioStreamer.ts';
@@ -25,7 +20,6 @@ interface Message {
   sender: 'user' | 'assistant';
   text: string;
   timestamp: string;
-  audioBlobUrl?: string;
 }
 
 interface VoiceAssistantHubProps {
@@ -48,8 +42,8 @@ export const VoiceAssistantHub: React.FC<VoiceAssistantHubProps> = ({
   const [isAssistantSpeaking, setIsAssistantSpeaking] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string>(
     lang === 'fr'
-      ? "Prêt à démarrer l'échange vocal"
-      : 'Ready for live voice conversation'
+      ? "Prêt à démarrer l'échange vocal en temps réel"
+      : 'Ready for real-time voice conversation'
   );
   const [selectedVoice, setSelectedVoice] = useState<'Fenrir' | 'Charon'>('Fenrir');
   const [textInput, setTextInput] = useState('');
@@ -139,20 +133,19 @@ export const VoiceAssistantHub: React.FC<VoiceAssistantHubProps> = ({
 
           setStatusMessage(
             lang === 'fr'
-              ? 'En écoute • Vous pouvez parler ou poser vos questions'
-              : 'Listening • You can speak or ask questions'
+              ? 'En écoute • Posez vos questions à la voix'
+              : 'Listening • Ask your questions by voice'
           );
 
-          // Trigger the required opening greeting:
+          // Trigger the required opening greeting
           ws.send(JSON.stringify({ type: 'trigger_greeting', lang }));
         } catch (micErr: any) {
           console.error('Mic access error:', micErr);
           setStatusMessage(
             lang === 'fr'
-              ? 'Micro désactivé ou refusé • Mode écoute active'
+              ? 'Micro désactivé • Mode écoute active'
               : 'Microphone permission needed • Assistant listening'
           );
-          // Trigger greeting anyway
           ws.send(JSON.stringify({ type: 'trigger_greeting', lang }));
         }
       };
@@ -355,7 +348,6 @@ export const VoiceAssistantHub: React.FC<VoiceAssistantHubProps> = ({
       setMessages((prev) => [...prev, assistantMsg]);
       setStatusMessage(lang === 'fr' ? 'Réponse reçue' : 'Response received');
 
-      // Speak answer with deep tone
       speakTextWithTTS(reply);
     } catch (e: any) {
       console.error('Chat error:', e);
@@ -368,47 +360,47 @@ export const VoiceAssistantHub: React.FC<VoiceAssistantHubProps> = ({
   const samplePrompts =
     lang === 'fr'
       ? [
-          'Parle-moi de son parcours en finance et gestion de patrimoine',
-          "Pourquoi Maélane a-t-elle fondé ÉMERYS Conseil ?",
-          "Qu'a-t-elle étudié lors de son échange à Monaco (IUM) ?",
-          'Quelles sont ses compétences en analyse et sur Excel ?',
-          'Comment puis-je contacter ou recruter Maélane ?',
+          "Pourquoi Maélane a-t-elle fondé Émerys Conseil ?",
+          "Parle-moi de ses voyages dans le monde et son échange à New York (janvier 2026, 6 mois)",
+          "Quelle est son expérience de 2 ans en gestion de patrimoine et ses outils (Inovéa, Filianse) ?",
+          "Qu'est-ce qui la différencie sur le marché du travail (son triple profil) ?",
+          "Parle-moi de son aisance avec l'IA et de sa passion pour la photo",
         ]
       : [
-          "Tell me about Maélane's finance and wealth management background",
-          'What is her venture ÉMERYS Conseil about?',
-          'What did she study during her exchange at IUM Monaco?',
-          'What are her key skills in Excel, strategy and languages?',
-          'How can I get in touch or recruit Maélane?',
+          "Why did Maélane found Émerys Conseil?",
+          "Tell me about her world travels and 6-month NYC exchange at Baruch College (Jan 2026)",
+          "Tell me about her 2 years in wealth management and tools like Inovéa & Filianse",
+          "What sets her apart on the job market (her triple dimension)?",
+          "Tell me about her AI mastery and passion for photography",
         ];
 
   return (
-    <div className="flex flex-col h-full bg-slate-900/95 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden backdrop-blur-md">
+    <div className="flex flex-col h-full bg-white border border-[#E7E2DA] rounded-2xl shadow-sm overflow-hidden">
       {/* Top Bar / Controls */}
-      <div className="p-4 bg-slate-950/60 border-b border-slate-800 flex flex-wrap items-center justify-between gap-3">
+      <div className="p-4 bg-[#FAF8F5] border-b border-[#EFECE6] flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2.5">
           <div className="relative">
             <div
               className={`w-3.5 h-3.5 rounded-full ${
                 isLiveConnected
-                  ? 'bg-emerald-400 ring-4 ring-emerald-400/20 animate-pulse'
-                  : 'bg-slate-600'
+                  ? 'bg-emerald-600 ring-4 ring-emerald-600/20 animate-pulse'
+                  : 'bg-stone-400'
               }`}
             />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-white font-semibold text-sm">
+              <span className="text-stone-900 font-bold text-sm">
                 {lang === 'fr' ? "Assistant Vocal de Maélane" : "Maélane's Voice Assistant"}
               </span>
-              <span className="text-[10px] bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 px-2 py-0.5 rounded-full font-medium">
+              <span className="text-[10px] bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-0.5 rounded-full font-semibold">
                 Gemini 3.8 Live
               </span>
             </div>
-            <div className="text-[11px] text-slate-400 flex items-center gap-1.5">
+            <div className="text-[11px] text-stone-500 flex items-center gap-1.5">
               <span>
                 {lang === 'fr'
-                  ? 'Voix grave masculine (accent US en EN, accent FR en français)'
+                  ? 'Voix grave masculine (accent US en anglais, accent FR en français)'
                   : 'Deep male tone (American accent EN, French accent FR)'}
               </span>
             </div>
@@ -427,37 +419,33 @@ export const VoiceAssistantHub: React.FC<VoiceAssistantHubProps> = ({
                   : 'Language set: English'
               );
             }}
-            className="flex items-center gap-1 text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1.5 rounded-lg border border-slate-700 transition-colors"
+            className="flex items-center gap-1.5 text-xs bg-white hover:bg-stone-50 text-stone-700 px-2.5 py-1.5 rounded-lg border border-[#E7E2DA] transition-colors font-medium shadow-2xs"
             title="Switch Language"
           >
-            <Languages className="w-3.5 h-3.5 text-amber-400" />
-            <span className="font-semibold uppercase">{lang}</span>
+            <Languages className="w-3.5 h-3.5 text-emerald-700" />
+            <span className="font-bold uppercase text-emerald-900">{lang}</span>
           </button>
 
           {/* Voice selector */}
-          <div className="flex items-center gap-1 text-xs bg-slate-800 px-2 py-1 rounded-lg border border-slate-700">
-            <span className="text-slate-400 text-[10px]">Voice:</span>
+          <div className="flex items-center gap-1 text-xs bg-white px-2.5 py-1 rounded-lg border border-[#E7E2DA] shadow-2xs">
+            <span className="text-stone-500 text-[10px]">Voix:</span>
             <select
               value={selectedVoice}
               onChange={(e) => setSelectedVoice(e.target.value as any)}
               disabled={isLiveConnected}
-              className="bg-transparent text-amber-300 text-xs focus:outline-none cursor-pointer"
+              className="bg-transparent text-emerald-900 font-semibold text-xs focus:outline-none cursor-pointer"
             >
-              <option value="Fenrir" className="bg-slate-900 text-white">
-                Fenrir (Deep Baritone)
-              </option>
-              <option value="Charon" className="bg-slate-900 text-white">
-                Charon (Deep Bass)
-              </option>
+              <option value="Fenrir">Fenrir (Baritone grave)</option>
+              <option value="Charon">Charon (Basse profonde)</option>
             </select>
           </div>
         </div>
       </div>
 
       {/* Main Interactive Stage: Visualizer & Live Call Controls */}
-      <div className="py-6 px-4 bg-gradient-to-b from-slate-950/40 to-slate-900/60 border-b border-slate-800 flex flex-col items-center justify-center relative overflow-hidden">
+      <div className="py-7 px-4 bg-gradient-to-b from-[#FDFCF9] to-[#FAF8F5] border-b border-[#EFECE6] flex flex-col items-center justify-center relative overflow-hidden">
         {/* Visualizer Canvas */}
-        <div className="relative my-2">
+        <div className="relative my-1">
           <AudioWaveformVisualizer
             analyser={activeAnalyser}
             isActive={isLiveConnected || isAssistantSpeaking}
@@ -465,23 +453,23 @@ export const VoiceAssistantHub: React.FC<VoiceAssistantHubProps> = ({
             mode="circular"
           />
 
-          {/* Central status pill */}
+          {/* Central status icon */}
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-            <div className="p-3 rounded-full bg-slate-950/80 border border-slate-700/80 shadow-2xl backdrop-blur-md">
+            <div className="p-3.5 rounded-full bg-white border border-[#E7E2DA] shadow-md">
               {isAssistantSpeaking ? (
-                <Volume2 className="w-8 h-8 text-indigo-400 animate-pulse" />
+                <Volume2 className="w-8 h-8 text-emerald-700 animate-pulse" />
               ) : isMicActive ? (
-                <Mic className="w-8 h-8 text-emerald-400 animate-bounce" />
+                <Mic className="w-8 h-8 text-emerald-700 animate-bounce" />
               ) : (
-                <Radio className="w-8 h-8 text-slate-400" />
+                <Radio className="w-8 h-8 text-stone-400" />
               )}
             </div>
           </div>
         </div>
 
         {/* Live Status readout */}
-        <div className="mt-2 text-center max-w-md">
-          <p className="text-xs font-medium text-slate-300 transition-all">{statusMessage}</p>
+        <div className="mt-3 text-center max-w-md">
+          <p className="text-xs font-semibold text-stone-700 transition-all">{statusMessage}</p>
         </div>
 
         {/* Control Buttons */}
@@ -490,7 +478,7 @@ export const VoiceAssistantHub: React.FC<VoiceAssistantHubProps> = ({
             <button
               onClick={startLiveSession}
               disabled={isConnecting}
-              className="flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold text-sm px-5 py-2.5 rounded-xl shadow-lg shadow-emerald-950/40 transition-all transform active:scale-95 disabled:opacity-50"
+              className="flex items-center gap-2 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-sm px-5 py-2.5 rounded-xl shadow-sm transition-all transform active:scale-95 disabled:opacity-50"
             >
               <PhoneCall className="w-4 h-4" />
               <span>
@@ -499,7 +487,7 @@ export const VoiceAssistantHub: React.FC<VoiceAssistantHubProps> = ({
                     ? 'Connexion en cours...'
                     : 'Connecting...'
                   : lang === 'fr'
-                  ? 'Démarrer la conversation vocale'
+                  ? 'Démarrer la conversation vocale en direct'
                   : 'Start Live Voice Call'}
               </span>
             </button>
@@ -507,10 +495,10 @@ export const VoiceAssistantHub: React.FC<VoiceAssistantHubProps> = ({
             <>
               <button
                 onClick={toggleMic}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all ${
                   isMicActive
-                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-500/30'
-                    : 'bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30'
+                    ? 'bg-emerald-50 text-emerald-800 border border-emerald-300 hover:bg-emerald-100'
+                    : 'bg-amber-50 text-amber-800 border border-amber-300 hover:bg-amber-100'
                 }`}
               >
                 {isMicActive ? <Mic className="w-4 h-4" /> : <MicOff className="w-4 h-4" />}
@@ -527,7 +515,7 @@ export const VoiceAssistantHub: React.FC<VoiceAssistantHubProps> = ({
 
               <button
                 onClick={endLiveSession}
-                className="flex items-center gap-2 bg-rose-600/90 hover:bg-rose-500 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-md active:scale-95"
+                className="flex items-center gap-2 bg-rose-700 hover:bg-rose-800 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-all shadow-sm active:scale-95"
               >
                 <PhoneOff className="w-4 h-4" />
                 <span>{lang === 'fr' ? 'Raccrocher' : 'End Call'}</span>
@@ -538,27 +526,27 @@ export const VoiceAssistantHub: React.FC<VoiceAssistantHubProps> = ({
           {/* Quick Greeting Trigger */}
           <button
             onClick={handleTriggerGreeting}
-            className="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-amber-300 text-xs font-medium px-3.5 py-2.5 rounded-xl border border-slate-700 transition-all"
+            className="flex items-center gap-1.5 bg-white hover:bg-stone-50 text-emerald-800 text-xs font-semibold px-3.5 py-2.5 rounded-xl border border-[#E7E2DA] transition-all shadow-2xs"
             title="Say official opening greeting"
           >
-            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-            <span>{lang === 'fr' ? "Rejouer l'accueil" : 'Play Greeting'}</span>
+            <Sparkles className="w-3.5 h-3.5 text-emerald-700" />
+            <span>{lang === 'fr' ? "Rejouer l'accueil officiel" : 'Play Greeting'}</span>
           </button>
         </div>
       </div>
 
       {/* Suggested Quick Questions */}
-      <div className="px-4 py-2.5 bg-slate-950/40 border-b border-slate-800 overflow-x-auto scrollbar-none">
+      <div className="px-4 py-3 bg-[#FAF8F5] border-b border-[#EFECE6] overflow-x-auto scrollbar-none">
         <div className="flex items-center gap-2 min-w-max">
-          <span className="text-[11px] text-slate-400 font-medium flex items-center gap-1">
-            <HelpCircle className="w-3 h-3 text-amber-400" />
-            <span>{lang === 'fr' ? 'Sujets suggérés :' : 'Suggested topics:'}</span>
+          <span className="text-[11px] text-emerald-900 font-bold flex items-center gap-1">
+            <HelpCircle className="w-3.5 h-3.5 text-emerald-700" />
+            <span>{lang === 'fr' ? 'Sujets recommandés :' : 'Recommended topics:'}</span>
           </span>
           {samplePrompts.map((prompt, idx) => (
             <button
               key={idx}
               onClick={() => handleSendText(prompt)}
-              className="text-[11px] text-slate-300 hover:text-white bg-slate-800/80 hover:bg-slate-750 px-2.5 py-1 rounded-full border border-slate-700/60 transition-colors"
+              className="text-[11px] font-medium text-stone-700 hover:text-emerald-950 bg-white hover:bg-emerald-50 px-3 py-1.5 rounded-full border border-[#E7E2DA] hover:border-emerald-300 transition-colors shadow-2xs"
             >
               {prompt}
             </button>
@@ -567,14 +555,14 @@ export const VoiceAssistantHub: React.FC<VoiceAssistantHubProps> = ({
       </div>
 
       {/* Real-time Conversation Transcript */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3.5 max-h-[380px]">
+      <div className="flex-1 overflow-y-auto p-4 space-y-3.5 max-h-[380px] bg-white">
         {messages.map((msg) => (
           <div
             key={msg.id}
             className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}
           >
             <div className="flex items-center gap-1.5 mb-1 px-1">
-              <span className="text-[10px] text-slate-400 font-medium">
+              <span className="text-[10px] text-stone-500 font-semibold">
                 {msg.sender === 'user'
                   ? lang === 'fr'
                     ? 'Vous'
@@ -583,14 +571,14 @@ export const VoiceAssistantHub: React.FC<VoiceAssistantHubProps> = ({
                   ? "Assistant de Maélane (Voix grave)"
                   : "Maélane's Assistant (Deep Voice)"}
               </span>
-              <span className="text-[9px] text-slate-500">{msg.timestamp}</span>
+              <span className="text-[9px] text-stone-400">{msg.timestamp}</span>
             </div>
 
             <div
-              className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-xs leading-relaxed shadow-md ${
+              className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-xs leading-relaxed shadow-2xs ${
                 msg.sender === 'user'
-                  ? 'bg-gradient-to-r from-indigo-600 to-indigo-700 text-white rounded-tr-none'
-                  : 'bg-slate-800 text-slate-200 border border-slate-700/70 rounded-tl-none'
+                  ? 'bg-emerald-700 text-white rounded-tr-none'
+                  : 'bg-[#FAF8F5] text-stone-800 border border-[#E7E2DA] rounded-tl-none'
               }`}
             >
               <p className="whitespace-pre-wrap">{msg.text}</p>
@@ -598,10 +586,10 @@ export const VoiceAssistantHub: React.FC<VoiceAssistantHubProps> = ({
               {msg.sender === 'assistant' && (
                 <button
                   onClick={() => speakTextWithTTS(msg.text)}
-                  className="mt-2 text-[10px] text-amber-300 hover:text-amber-200 flex items-center gap-1 bg-slate-900/60 px-2 py-0.5 rounded transition-colors"
+                  className="mt-2 text-[11px] text-emerald-800 hover:text-emerald-950 font-semibold flex items-center gap-1 bg-white px-2 py-0.5 rounded border border-emerald-200 transition-colors"
                   title="Replay in spoken voice"
                 >
-                  <Volume2 className="w-3 h-3" />
+                  <Volume2 className="w-3 h-3 text-emerald-700" />
                   <span>{lang === 'fr' ? 'Écouter' : 'Listen'}</span>
                 </button>
               )}
@@ -609,8 +597,8 @@ export const VoiceAssistantHub: React.FC<VoiceAssistantHubProps> = ({
           </div>
         ))}
         {isGeneratingText && (
-          <div className="flex items-center gap-2 text-xs text-slate-400 italic py-1">
-            <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-spin" />
+          <div className="flex items-center gap-2 text-xs text-stone-500 italic py-1">
+            <Sparkles className="w-3.5 h-3.5 text-emerald-700 animate-spin" />
             <span>{lang === 'fr' ? "L'assistant formule sa réponse..." : 'Assistant is formulating response...'}</span>
           </div>
         )}
@@ -618,7 +606,7 @@ export const VoiceAssistantHub: React.FC<VoiceAssistantHubProps> = ({
       </div>
 
       {/* Bottom Text Input Bar */}
-      <div className="p-3 bg-slate-950/80 border-t border-slate-800">
+      <div className="p-3 bg-[#FAF8F5] border-t border-[#EFECE6]">
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -632,15 +620,15 @@ export const VoiceAssistantHub: React.FC<VoiceAssistantHubProps> = ({
             onChange={(e) => setTextInput(e.target.value)}
             placeholder={
               lang === 'fr'
-                ? 'Tapez une question sur Maélane ou utilisez la voix...'
-                : 'Type a question about Maélane or use voice...'
+                ? 'Posez une question sur Émerys Conseil, ses compétences ou son parcours...'
+                : 'Ask a question about Émerys Conseil, skills, or background...'
             }
-            className="flex-1 bg-slate-800/80 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+            className="flex-1 bg-white border border-[#E7E2DA] rounded-xl px-3.5 py-2.5 text-xs text-stone-900 placeholder-stone-400 focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 shadow-2xs"
           />
           <button
             type="submit"
             disabled={!textInput.trim() || isGeneratingText}
-            className="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 text-white p-2.5 rounded-xl transition-all active:scale-95"
+            className="bg-emerald-700 hover:bg-emerald-800 disabled:opacity-40 text-white p-2.5 rounded-xl transition-all active:scale-95 shadow-sm"
             title="Send"
           >
             <Send className="w-4 h-4" />

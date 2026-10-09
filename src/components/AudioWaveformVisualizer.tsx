@@ -35,9 +35,9 @@ export const AudioWaveformVisualizer: React.FC<AudioWaveformVisualizerProps> = (
       if (analyser && isActive) {
         analyser.getByteFrequencyData(dataArray);
       } else {
-        // Idle gentle breathing pulsation
+        // Subtle ambient pulsation when idle
         for (let i = 0; i < bufferLength; i++) {
-          dataArray[i] = Math.sin(Date.now() * 0.003 + i * 0.2) * 12 + 14;
+          dataArray[i] = Math.sin(Date.now() * 0.003 + i * 0.25) * 8 + 12;
         }
       }
 
@@ -48,28 +48,35 @@ export const AudioWaveformVisualizer: React.FC<AudioWaveformVisualizerProps> = (
         const bars = 48;
         const step = (Math.PI * 2) / bars;
 
-        // Outer glow
-        const gradient = ctx.createRadialGradient(centerX, centerY, radius * 0.4, centerX, centerY, radius * 1.5);
+        // Outer glow on warm beige canvas
+        const gradient = ctx.createRadialGradient(
+          centerX,
+          centerY,
+          radius * 0.3,
+          centerX,
+          centerY,
+          radius * 1.55
+        );
         if (isSpeaking) {
-          gradient.addColorStop(0, 'rgba(59, 130, 246, 0.4)');
-          gradient.addColorStop(0.5, 'rgba(147, 51, 234, 0.2)');
-          gradient.addColorStop(1, 'rgba(15, 23, 42, 0)');
+          gradient.addColorStop(0, 'rgba(4, 120, 87, 0.25)'); // Emerald 700
+          gradient.addColorStop(0.5, 'rgba(16, 185, 129, 0.12)'); // Emerald 500
+          gradient.addColorStop(1, 'rgba(250, 248, 245, 0)');
         } else if (isActive) {
-          gradient.addColorStop(0, 'rgba(16, 185, 129, 0.35)');
-          gradient.addColorStop(0.5, 'rgba(6, 182, 212, 0.15)');
-          gradient.addColorStop(1, 'rgba(15, 23, 42, 0)');
+          gradient.addColorStop(0, 'rgba(5, 150, 105, 0.2)');
+          gradient.addColorStop(0.5, 'rgba(52, 211, 153, 0.08)');
+          gradient.addColorStop(1, 'rgba(250, 248, 245, 0)');
         } else {
-          gradient.addColorStop(0, 'rgba(148, 163, 184, 0.15)');
-          gradient.addColorStop(1, 'rgba(15, 23, 42, 0)');
+          gradient.addColorStop(0, 'rgba(214, 211, 209, 0.25)');
+          gradient.addColorStop(1, 'rgba(250, 248, 245, 0)');
         }
         ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, width, height);
 
-        // Circular frequency spikes
+        // Circular frequency spikes in emerald palette
         for (let i = 0; i < bars; i++) {
           const index = Math.floor((i / bars) * (bufferLength / 2));
           const val = dataArray[index] || 10;
-          const barHeight = Math.max(6, (val / 255) * (radius * 0.75));
+          const barHeight = Math.max(5, (val / 255) * (radius * 0.8));
 
           const angle = i * step - Math.PI / 2;
           const x1 = centerX + Math.cos(angle) * radius;
@@ -84,11 +91,12 @@ export const AudioWaveformVisualizer: React.FC<AudioWaveformVisualizerProps> = (
           ctx.lineCap = 'round';
 
           if (isSpeaking) {
-            ctx.strokeStyle = `hsl(${220 + (i / bars) * 60}, 90%, 65%)`;
+            // Radiant emerald gradient
+            ctx.strokeStyle = `hsl(${155 + (i % 6) * 4}, 75%, ${36 + (i % 4) * 5}%)`;
           } else if (isActive) {
-            ctx.strokeStyle = `hsl(${160 + (i / bars) * 40}, 85%, 60%)`;
+            ctx.strokeStyle = `hsl(158, 65%, ${42 + (i % 3) * 6}%)`;
           } else {
-            ctx.strokeStyle = 'rgba(148, 163, 184, 0.4)';
+            ctx.strokeStyle = 'rgba(168, 162, 158, 0.45)'; // Stone 400
           }
 
           ctx.stroke();
@@ -96,22 +104,12 @@ export const AudioWaveformVisualizer: React.FC<AudioWaveformVisualizerProps> = (
 
         // Inner core circle
         ctx.beginPath();
-        ctx.arc(centerX, centerY, radius * 0.88, 0, Math.PI * 2);
-        ctx.fillStyle = isSpeaking ? '#1e1b4b' : isActive ? '#064e3b' : '#0f172a';
+        ctx.arc(centerX, centerY, radius * 0.86, 0, Math.PI * 2);
+        ctx.fillStyle = isSpeaking ? '#064E3B' : isActive ? '#065F46' : '#FFFFFF';
         ctx.fill();
-        ctx.lineWidth = 2;
-        ctx.strokeStyle = isSpeaking ? '#818cf8' : isActive ? '#34d399' : '#334155';
+        ctx.lineWidth = 2.5;
+        ctx.strokeStyle = isSpeaking ? '#34D399' : isActive ? '#10B981' : '#E7E5E4';
         ctx.stroke();
-      } else {
-        // Linear horizontal visualizer bars
-        const barWidth = (width / bufferLength) * 2.2;
-        let x = 0;
-        for (let i = 0; i < bufferLength / 2; i++) {
-          const barHeight = ((dataArray[i] || 5) / 255) * height * 0.8;
-          ctx.fillStyle = isSpeaking ? '#818cf8' : isActive ? '#34d399' : '#64748b';
-          ctx.fillRect(x, (height - barHeight) / 2, barWidth - 2, barHeight);
-          x += barWidth;
-        }
       }
     };
 
@@ -127,7 +125,7 @@ export const AudioWaveformVisualizer: React.FC<AudioWaveformVisualizerProps> = (
       ref={canvasRef}
       width={280}
       height={280}
-      className="mx-auto rounded-full drop-shadow-2xl"
+      className="mx-auto rounded-full drop-shadow-md"
     />
   );
 };

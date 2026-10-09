@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import { WebSocketServer, WebSocket } from 'ws';
 import { GoogleGenAI, Modality, LiveServerMessage } from '@google/genai';
 import { createServer as createViteServer } from 'vite';
+import fs from 'fs';
 import { MAELANE_DATA, MAELANE_SYSTEM_PROMPT } from './src/data/resumeData.ts';
 
 dotenv.config();
@@ -14,7 +15,7 @@ const isProd = process.env.NODE_ENV === 'production';
 
 async function startServer() {
   const app = express();
-  app.use(express.json({ limit: '10mb' }));
+  app.use(express.json({ limit: '20mb' }));
 
   const server = http.createServer(app);
 
@@ -31,6 +32,44 @@ async function startServer() {
   // REST API Routes
   app.get('/api/info', (_req, res) => {
     res.json(MAELANE_DATA);
+  });
+
+  // Upload original user photo directly
+  app.post('/api/upload-photo', (req, res) => {
+    try {
+      const { imageBase64 } = req.body;
+      if (!imageBase64) {
+        return res.status(400).json({ error: 'Image base64 data is required' });
+      }
+      const cleanBase64 = imageBase64.replace(/^data:image\/\w+;base64,/, '');
+      const buffer = Buffer.from(cleanBase64, 'base64');
+      const targetPath = path.resolve(process.cwd(), 'src/assets/images/maelane.jpg');
+      fs.writeFileSync(targetPath, buffer);
+      console.log('Original photo saved to', targetPath);
+      res.json({ success: true });
+    } catch (err: any) {
+      console.error('Error saving uploaded photo:', err);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  // Upload official company logo directly
+  app.post('/api/upload-logo', (req, res) => {
+    try {
+      const { imageBase64 } = req.body;
+      if (!imageBase64) {
+        return res.status(400).json({ error: 'Image base64 data is required' });
+      }
+      const cleanBase64 = imageBase64.replace(/^data:image\/\w+;base64,/, '');
+      const buffer = Buffer.from(cleanBase64, 'base64');
+      const targetPath = path.resolve(process.cwd(), 'src/assets/images/official_emerys_logo.png');
+      fs.writeFileSync(targetPath, buffer);
+      console.log('Official logo saved to', targetPath);
+      res.json({ success: true });
+    } catch (err: any) {
+      console.error('Error saving uploaded logo:', err);
+      res.status(500).json({ error: err.message });
+    }
   });
 
   // REST Chat endpoint using gemini-3.8-flash
