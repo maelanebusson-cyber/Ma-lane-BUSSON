@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Upload } from 'lucide-react';
+import defaultOfficialLogo from '../assets/images/official_emerys_logo.png';
 
 interface EmerysLogoProps {
   className?: string;
@@ -13,8 +14,8 @@ export const EmerysLogo: React.FC<EmerysLogoProps> = ({
   size = 'md',
   showTagline = true,
 }) => {
-  const [officialLogo, setOfficialLogo] = useState<string | null>(() => {
-    return localStorage.getItem('emerys_official_logo') || null;
+  const [officialLogo, setOfficialLogo] = useState<string>(() => {
+    return localStorage.getItem('emerys_official_logo_v2') || defaultOfficialLogo;
   });
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -26,7 +27,7 @@ export const EmerysLogo: React.FC<EmerysLogoProps> = ({
     reader.onload = async () => {
       const base64 = reader.result as string;
       setOfficialLogo(base64);
-      localStorage.setItem('emerys_official_logo', base64);
+      localStorage.setItem('emerys_official_logo_v2', base64);
 
       try {
         await fetch('/api/upload-logo', {
@@ -51,7 +52,7 @@ export const EmerysLogo: React.FC<EmerysLogoProps> = ({
           <img
             src={officialLogo}
             alt="Émerys Conseil"
-            className={`${imgHeight} object-contain transition-transform group-hover:scale-105`}
+            className={`${imgHeight} w-auto object-contain transition-transform group-hover:scale-105`}
           />
           <button
             onClick={() => fileInputRef.current?.click()}

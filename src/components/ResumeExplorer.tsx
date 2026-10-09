@@ -30,7 +30,7 @@ interface ResumeExplorerProps {
 export const ResumeExplorer: React.FC<ResumeExplorerProps> = ({ onAskAbout, lang }) => {
   const [activeTab, setActiveTab] = useState<'overview' | 'experiences' | 'education' | 'skills' | 'travels' | 'associative'>('overview');
   const [photoSrc, setPhotoSrc] = useState<string>(() => {
-    return localStorage.getItem('maelane_custom_photo') || defaultMaelanePhoto;
+    return localStorage.getItem('maelane_custom_photo_v2') || defaultMaelanePhoto;
   });
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -42,7 +42,7 @@ export const ResumeExplorer: React.FC<ResumeExplorerProps> = ({ onAskAbout, lang
     reader.onload = async () => {
       const base64Data = reader.result as string;
       setPhotoSrc(base64Data);
-      localStorage.setItem('maelane_custom_photo', base64Data);
+      localStorage.setItem('maelane_custom_photo_v2', base64Data);
 
       // Persist to server
       try {
@@ -67,7 +67,7 @@ export const ResumeExplorer: React.FC<ResumeExplorerProps> = ({ onAskAbout, lang
             <img
               src={photoSrc}
               alt={MAELANE_DATA.name}
-              className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
+              className="w-full h-full object-cover object-[center_20%] transition-transform duration-500 group-hover:scale-105"
             />
             {/* Upload overlay button */}
             <button
